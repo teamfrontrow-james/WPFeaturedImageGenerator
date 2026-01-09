@@ -1,0 +1,127 @@
+.wpafg-container {
+    margin-top: 20px;
+}
+
+.wpafg-settings-section {
+    background: #fff;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 1px rgba(0,0,0,.04);
+}
+
+.wpafg-dashboard-section {
+    background: #fff;
+    padding: 20px;
+    box-shadow: 0 1px 1px rgba(0,0,0,.04);
+}
+
+.wpafg-filters {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #f6f7f7;
+    border: 1px solid #dcdcde;
+    border-radius: 3px;
+}
+
+.wpafg-filters form {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.wpafg-filters label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+}
+
+.wpafg-filters select {
+    min-width: 150px;
+}
+
+.wpafg-controls {
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+#wpafg-stop-all {
+    background: #dc3232;
+    border-color: #dc3232;
+    color: #fff;
+    display: none !important;
+}
+
+#wpafg-stop-all.wpafg-visible {
+    display: inline-block !important;
+}
+
+#wpafg-stop-all:hover {
+    background: #a00;
+    border-color: #a00;
+    color: #fff;
+}
+
+.wpafg-progress-container {
+    flex: 1;
+    max-width: 400px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.wpafg-progress-bar {
+    flex: 1;
+    height: 24px;
+    background: #f0f0f1;
+    border-radius: 3px;
+    overflow: hidden;
+    position: relative;
+}
+
+.wpafg-progress-fill {
+    height: 100%;
+    background: #2271b1;
+    transition: width 0.3s ease;
+    border-radius: 3px;
+}
+
+.wpafg-progress-text {
+    font-weight: 600;
+    min-width: 45px;
+    text-align: right;
+}
+
+.wpafg-status[data-status="pending"] .wpafg-status-text {
+    color: #646970;
+}
+
+.wpafg-status[data-status="analyzing"] .wpafg-status-text {
+    color: #2271b1;
+}
+
+.wpafg-status[data-status="rendering"] .wpafg-status-text {
+    color: #d63638;
+}
+
+.wpafg-status[data-status="done"] .wpafg-status-text {
+    color: #46b450;
+    font-weight: 600;
+}
+
+.wpafg-status[data-status="error"] .wpafg-status-text {
+    color: #dc3232;
+    font-weight: 600;
+}
+
+#wpafg-posts-list tr {
+    transition: background-color 0.2s ease;
+}
+
+#wpafg-posts-list tr:hover {
+    background-color: #f6f7f7;
+}
+

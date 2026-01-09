@@ -1,0 +1,24 @@
+# WordPress
+.DS_Store
+Thumbs.db
+
+# Archives
+*.zip
+*.tar.gz
+*.rar
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+wpafg-logs/
+
+# Temporary files
+*.tmp
+*.bak
+*.backup
