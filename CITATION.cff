@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+title: WP Auto-Feature Gen
+message: "If this plugin helps your WordPress workflow, please cite the repository."
+type: software
+authors:
+  - family-names: Ross
+    given-names: James
+repository-code: "https://github.com/teamfrontrow-james/WPFeaturedImageGenerator"
+url: "https://frontrowsales.com"
+license: GPL-2.0-or-later
+version: 1.0.0
+date-released: "2026-05-27"

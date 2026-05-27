@@ -1,247 +1,117 @@
 # WP Auto-Feature Gen
 
-A WordPress plugin that bulk-generates featured images for drafted and scheduled posts/pages using AI (Kie.ai for images, OpenRouter for text enhancement).
+[![CI](https://github.com/teamfrontrow-james/WPFeaturedImageGenerator/actions/workflows/ci.yml/badge.svg)](https://github.com/teamfrontrow-james/WPFeaturedImageGenerator/actions/workflows/ci.yml)
+[![License: GPL v2 or later](https://img.shields.io/badge/license-GPL--2.0--or--later-blue.svg)](LICENSE)
+
+**Bulk-generate SEO-friendly featured images for draft and scheduled WordPress posts with Kie.ai image generation and OpenRouter prompt enhancement.**
+
+```text
+Draft/Scheduled post --> OpenRouter (enhance prompt)
+                              |
+                              v
+                    Kie.ai (generate image) --callback--> WordPress
+                              |
+                              v
+          Media Library sideload + featured image + alt text
+```
 
 ## Features
 
-### Core Capabilities
+- Generate featured images for draft and scheduled posts/pages in bulk.
+- Enhance image prompts from the post title and content excerpt using OpenRouter.
+- Create 16:9 JPG images with Kie.ai and save them locally to the WordPress Media Library.
+- Set the generated image as the post featured image automatically.
+- Generate concise image alt text for stronger image SEO and accessibility.
+- Filter by post type and status without full-page reloads.
+- Process posts one at a time with a visible queue, progress bar, and stop control.
+- Enable optional debug logs for API, callback, sideloading, and filter troubleshooting.
 
-- **AI-Powered Image Generation**: Uses Kie.ai (nano-banana-pro model) for high-quality image generation
-- **Smart Prompt Enhancement**: Uses OpenRouter (GPT-OSS-120b) to enhance prompts based on post content
-- **Bulk Processing**: Process multiple posts/pages at once with a visual progress bar
-- **Flexible Filtering**: Filter by post type (Posts/Pages/Both) and status (Draft/Scheduled/Both)
-- **Client-Side Queue**: Processes posts one at a time via AJAX to avoid PHP timeouts
-- **True Image Hosting**: Downloads and stores images locally in WordPress uploads directory
-- **SEO-Friendly**: Automatically generates alt text for images using OpenRouter
-- **Customizable Style**: Add global style instructions to all generated images
-- **Stop Generation**: Ability to stop the generation process at any time
-- **AJAX-Based Filtering**: Filter posts without page reloads (prevents 500 errors from other plugins)
-- **Optional Debug Mode**: Enable/disable debug logging and display for troubleshooting
+## Prerequisites
 
-### Image Generation Process
+- WordPress 5.0 or newer.
+- PHP 7.4 or newer.
+- A Kie.ai API key for image generation.
+- An OpenRouter API key for prompt enhancement and alt text generation.
+- A publicly reachable WordPress site so Kie.ai can POST callbacks to `admin-ajax.php?action=wpafg_kie_callback`.
 
-1. **Prompt Enhancement**: 
-   - Extracts first 1000 characters from post content
-   - Sends title + content excerpt to OpenRouter for visual description
-   - Receives enhanced prompt optimized for image generation
+Localhost and private staging URLs usually cannot receive Kie.ai callbacks unless they are exposed through a tunnel or public staging domain.
 
-2. **Style Application**:
-   - Combines enhanced prompt with your custom "Prompt Style"
-   - Final format: `[Enhanced Prompt], style: [Your Style]`
+## Quickstart
 
-3. **Image Generation**:
-   - Sends final prompt to Kie.ai using callback method (no polling needed)
-   - Uses 16:9 aspect ratio, 1K resolution, JPG format
-   - Kie.ai calls back when image is ready
-
-4. **Image Sideloading**:
-   - Downloads image from Kie.ai CDN
-   - Saves to WordPress uploads directory (`/wp-content/uploads/`)
-   - Creates WordPress attachment with proper metadata
-   - Sets as featured image for the post
-
-5. **Alt Text Generation**:
-   - Generates SEO-friendly alt text using OpenRouter
-   - Limits to 100 characters maximum
-   - Saves to attachment metadata (`_wp_attachment_image_alt`)
-
-## Installation
-
-1. Upload the plugin folder to `/wp-content/plugins/` directory
-2. Activate the plugin through the 'Plugins' menu in WordPress
-3. Navigate to **Settings > WP Auto-Feature Gen** in the WordPress admin menu
-4. Configure your API keys:
-   - **Kie.ai API Key**: Get your API key from [Kie.ai](https://kie.ai)
-   - **OpenRouter API Key**: Get your API key from [OpenRouter](https://openrouter.ai)
-   - **Prompt Style**: Optional global style instructions (e.g., "Photorealistic, 8k, cinematic lighting")
-   - **Debug Mode**: Enable/disable debug logging (optional, for troubleshooting)
+1. Upload this plugin folder to `/wp-content/plugins/wp-auto-feature-gen/`.
+2. Activate **WP Auto-Feature Gen** from **Plugins** in WordPress admin.
+3. Open **Settings -> WP Auto-Feature Gen**.
+4. Add your Kie.ai and OpenRouter API keys.
+5. Optional: set a global prompt style such as `Photorealistic editorial image, natural light, no text`.
+6. Choose post type/status filters, click **Filter**, then click **Generate All**.
 
 ## Usage
 
-### Basic Workflow
+The dashboard lists draft and scheduled posts/pages that do not already have a featured image. The queue processes one item at a time to reduce PHP timeout risk and keep failures isolated to the current post.
 
-1. Go to **Settings > WP Auto-Feature Gen** in the WordPress admin menu
-2. Configure your API keys and prompt style in the Settings section
-3. Use the filters to select:
-   - **Post Type**: Posts, Pages, or Both
-   - **Status**: Draft, Scheduled, or Both
-4. Click **Filter** to update the list (no page reload required)
-5. The dashboard will display all matching posts/pages without featured images
-6. Click **Generate All** to start processing
-7. Watch the progress bar as each post/page is processed
-8. Click **Stop** at any time to halt the generation process
+Status indicators:
 
-### Status Indicators
+- **Pending**: queued but not started.
+- **Analyzing Content...**: OpenRouter is creating the image prompt.
+- **Rendering Image...**: Kie.ai generation has started.
+- **Waiting for image...**: WordPress is polling local post meta while waiting for the Kie.ai callback.
+- **Done**: image was sideloaded, attached, set as featured image, and alt text was saved.
+- **Error**: processing failed; enable Debug Mode for details.
+- **Stopped**: queue processing was halted by the user.
 
-- **Pending**: Not yet processed
-- **Analyzing Content...**: Generating prompt description with OpenRouter
-- **Rendering Image...**: Creating image with Kie.ai
-- **Waiting for Callback...**: Image generation started, waiting for Kie.ai callback
-- **Done**: Successfully completed (image saved and alt text generated)
-- **Error**: Something went wrong (check error message in status column)
-- **Stopped**: Generation was stopped by user
+## Configuration
 
-### Filtering Posts
+| Setting | Purpose | Default / implementation |
+|---|---|---|
+| Kie.ai API key | Authenticates image-generation requests. | Stored in `wpafg_kie_api_key`. |
+| OpenRouter API key | Authenticates prompt and alt-text requests. | Stored in `wpafg_openrouter_api_key`. |
+| Prompt Style | Appended to every enhanced image prompt. | Empty until configured. |
+| Debug Mode | Writes and displays debug logs. | Off by default; logs are stored in `/wp-content/uploads/wpafg-logs/`. |
+| OpenRouter model | Prompt enhancement and alt text. | `openai/gpt-oss-120b`. |
+| Kie.ai model | Image rendering. | `nano-banana-pro`, `16:9`, `1K`, `jpg`. |
 
-The plugin supports flexible filtering:
+## Outputs
 
-- **Post Type Options**:
-  - **Posts**: Only WordPress posts
-  - **Pages**: Only WordPress pages
-  - **Both**: Both posts and pages
+For each successful post, the plugin downloads the generated image into the WordPress uploads directory, creates a Media Library attachment, assigns it as the featured image, and stores generated alt text in `_wp_attachment_image_alt`.
 
-- **Status Options**:
-  - **Draft**: Posts/pages with draft status
-  - **Scheduled**: Posts/pages with scheduled (future) status
-  - **Both**: Both draft and scheduled posts/pages
+## Examples
 
-Filtering is done via AJAX, so there's no page reload and no risk of 500 errors from other plugins.
+- Prompt style recipes live in [examples/prompt-styles.md](examples/prompt-styles.md).
+- A production-safe WordPress debug logging snippet lives in [examples/wp-config-debug.php](examples/wp-config-debug.php).
 
-### Debug Mode
+## Documentation
 
-When enabled, Debug Mode provides:
+- [API setup](docs/api-setup.md): Kie.ai, OpenRouter, callback reachability, and model defaults.
+- [Security notes](docs/security.md): nonces, capabilities, stored options, callback handling, and debug/error-shield behavior.
+- [Troubleshooting](docs/troubleshooting.md): common filtering, callback, sideloading, and debug-log issues.
+- [GitHub visibility](docs/github-visibility.md): recommended repository description, topics, and profile settings.
+- [Releasing](RELEASING.md): version sync, changelog, tag, zip, and GitHub release flow.
 
-- **Debug Log Display**: Shows the last 50 log entries in a textarea on the dashboard
-- **Detailed Logging**: Logs all operations including:
-  - Filter queries and results
-  - API calls and responses
-  - Image download and attachment creation
-  - Featured image assignment
-  - Alt text generation
-  - Error details with context
+## Development
 
-- **Log Management**:
-  - **Refresh Log**: Reload the log display
-  - **Clear Log**: Delete today's log file
+Run PHP syntax checks locally:
 
-Log files are stored in `/wp-content/uploads/wpafg-logs/debug-YYYY-MM-DD.log`
-
-## Requirements
-
-- WordPress 5.0 or higher
-- PHP 7.4 or higher
-- Valid API keys for:
-  - Kie.ai (for image generation)
-  - OpenRouter (for prompt enhancement and alt text)
-
-## API Configuration
-
-### OpenRouter
-- **Model**: `openai/gpt-oss-120b`
-- **Endpoint**: `https://openrouter.ai/api/v1/chat/completions`
-- **Used for**: 
-  - Prompt enhancement (converts post title + content into visual description)
-  - Alt text generation (creates SEO-friendly alt text)
-
-### Kie.ai
-- **Model**: `nano-banana-pro`
-- **Endpoint**: `https://api.kie.ai/api/v1/jobs/createTask`
-- **Settings**: 
-  - Aspect Ratio: 16:9
-  - Resolution: 1K
-  - Format: JPG
-- **Method**: Callback-based (no polling required)
-- **Used for**: Image generation
-
-## Technical Details
-
-### Architecture
-
-- **Client-Side Queue**: JavaScript processes posts sequentially via AJAX to prevent PHP timeouts
-- **AJAX Timeout**: 120 seconds per post (allows for API calls and callbacks)
-- **Callback Handling**: Kie.ai sends POST request to plugin callback endpoint when image is ready
-- **Error Shield**: Suppresses notices from other plugins to prevent 500 errors
-- **Security**: Nonce verification and capability checks (`manage_options`)
-
-### Database
-
-- Stores task IDs in post meta (`_wpafg_task_id`, `_wpafg_kie_task_id`)
-- Tracks status in post meta (`_wpafg_status`)
-- Stores error messages in post meta (`_wpafg_error`)
-- Cleans up meta after successful completion
-
-### File Structure
-
-```
-wp-auto-feature-gen/
-├── wp-auto-feature-gen.php          # Main plugin file
-├── includes/
-│   ├── class-wpafg-admin.php       # Admin dashboard and settings
-│   ├── class-wpafg-ajax.php        # AJAX handlers
-│   ├── class-wpafg-api-kie.php     # Kie.ai API integration
-│   ├── class-wpafg-api-openrouter.php # OpenRouter API integration
-│   └── class-wpafg-debug.php       # Debug logging
-├── assets/
-│   ├── js/
-│   │   └── admin.js                # Client-side queue and UI
-│   └── css/
-│       └── admin.css               # Admin styles
-└── README.md                        # This file
+```bash
+find . -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 -P4 php -l
 ```
 
-## Troubleshooting
+CI runs the same syntax lint across PHP 7.4 through 8.3. See [RELEASING.md](RELEASING.md) before tagging a release.
 
-### Common Issues
+## External Services
 
-1. **500 Error When Filtering**:
-   - This is usually caused by other plugins outputting notices before headers
-   - The plugin includes an "error shield" to prevent this
-   - If it persists, enable Debug Mode to see detailed logs
+This plugin sends post titles, content excerpts, generated prompts, callback URLs, and generated image URLs to third-party AI services only when an administrator starts generation. Review the service providers' terms and privacy policies before using the plugin on production content.
 
-2. **Images Not Saving**:
-   - Check that WordPress uploads directory is writable
-   - Verify API keys are correct
-   - Enable Debug Mode to see detailed error messages
-   - Check that `media_handle_sideload()` has proper permissions
+- Kie.ai: image generation.
+- OpenRouter: prompt enhancement and alt text.
 
-3. **No Posts Showing**:
-   - Verify you have posts/pages with draft or scheduled status
-   - Check that posts don't already have featured images
-   - Use Debug Mode to see query results and counts
+## Contributing
 
-4. **Generation Stops Unexpectedly**:
-   - Check browser console for JavaScript errors
-   - Verify AJAX endpoint is accessible
-   - Check WordPress error logs
-   - Enable Debug Mode for detailed operation logs
-
-### Debug Mode
-
-Enable Debug Mode in Settings to get detailed information about:
-- All database queries and results
-- API request/response details
-- Image download and attachment creation steps
-- Featured image assignment verification
-- Alt text generation results
-- Error messages with full context
-
-## Support
-
-For issues or questions:
-- Check WordPress error logs (`/wp-content/debug.log` if WP_DEBUG is enabled)
-- Enable Debug Mode and check the debug log display
-- Check browser console for JavaScript errors
-- Verify API key validity
-- Check network connectivity
-- Review plugin debug logs in `/wp-content/uploads/wpafg-logs/`
-
-## Changelog
-
-### Version 1.0.0
-- Initial release
-- Bulk featured image generation for draft and scheduled posts/pages
-- AI-powered prompt enhancement
-- Customizable prompt styles
-- AJAX-based filtering
-- Stop generation functionality
-- Optional debug mode
-- Automatic alt text generation
+Issues and pull requests are welcome. Please start with [CONTRIBUTING.md](CONTRIBUTING.md), open a focused issue for bugs or feature requests, and avoid sharing private API keys or unpublished customer content in public reports.
 
 ## License
 
-GPL v2 or later
+WP Auto-Feature Gen is licensed under the [GPL v2 or later](LICENSE).
 
 ## Author
 
-**James Ross**  
-Website: https://frontrowsales.com
+Created by [James Ross](https://frontrowsales.com) / Front Row Sales.

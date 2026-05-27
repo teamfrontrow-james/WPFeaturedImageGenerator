@@ -6,6 +6,15 @@ Thumbs.db
 *.zip
 *.tar.gz
 *.rar
+wp-auto-feature-gen-*.zip
+
+# Dependencies
+vendor/
+node_modules/
+
+# Build output
+build/
+dist/
 
 # IDE
 .idea/

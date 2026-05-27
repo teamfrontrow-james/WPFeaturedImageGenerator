@@ -1,9 +1,11 @@
 <?php
 /**
  * Plugin Name: WP Auto-Feature Gen
- * Plugin URI: https://frontrowsales.com
- * Description: Bulk generate featured images for drafted posts using AI (Kie.ai and OpenRouter)
+ * Plugin URI: https://github.com/teamfrontrow-james/WPFeaturedImageGenerator
+ * Description: Bulk-generate SEO-friendly featured images for draft and scheduled WordPress posts using Kie.ai and OpenRouter.
  * Version: 1.0.0
+ * Requires at least: 5.0
+ * Requires PHP: 7.4
  * Author: James Ross
  * Author URI: https://frontrowsales.com
  * License: GPL v2 or later
@@ -190,4 +192,3 @@ function wpafg_init() {
 
 // Start the plugin
 wpafg_init();
-
