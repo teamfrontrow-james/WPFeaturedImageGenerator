@@ -84,7 +84,6 @@ For each successful post, the plugin downloads the generated image into the Word
 - [API setup](docs/api-setup.md): Kie.ai, OpenRouter, callback reachability, and model defaults.
 - [Security notes](docs/security.md): nonces, capabilities, stored options, callback handling, and debug/error-shield behavior.
 - [Troubleshooting](docs/troubleshooting.md): common filtering, callback, sideloading, and debug-log issues.
-- [GitHub visibility](docs/github-visibility.md): recommended repository description, topics, and profile settings.
 - [Releasing](RELEASING.md): version sync, changelog, tag, zip, and GitHub release flow.
 
 ## Development
